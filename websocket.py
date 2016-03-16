@@ -326,9 +326,12 @@ class WebSocket(object):
             message = str(message)
 
         header = Header.encode_header(True, opcode, '', len(message), 0)
-
+        
         try:
-            self.raw_write(header + message)
+            if message == b'\x03\xe8':
+                self.raw_write(message)
+            else:
+                self.raw_write(header + message)
         except error:
             raise WebSocketError(MSG_SOCKET_DEAD)
 
@@ -358,7 +361,7 @@ class WebSocket(object):
             self.current_app.on_close(MSG_ALREADY_CLOSED)
 
         try:
-            message = self._encode_bytes(message)
+            message = self._encode_bytes(message).encode()
 
             self.send_frame(
                 struct.pack('!H%ds' % len(message), code, message),
@@ -420,7 +423,7 @@ class Header(object):
         payload = bytearray(payload)
         mask = bytearray(self.mask)
 
-        for i in xrange(self.length):
+        for i in range(self.length):
             payload[i] ^= mask[i % 4]
 
         return str(payload)
