@@ -178,7 +178,7 @@ class WampProtocol(BaseProtocol):
         try:
             result = self.procedures.call(uri, args)
             result_msg = [self.MSG_CALL_RESULT, call_id, result]
-        except Exception, e:
+        except Exception as e:
             result_msg = [self.MSG_CALL_ERROR,
                           call_id] + self._get_exception_info(e)
 
